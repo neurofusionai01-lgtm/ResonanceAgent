@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Configuration
+.env
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Database
+resonance_user_memory/
+*.db
+*.sqlite3

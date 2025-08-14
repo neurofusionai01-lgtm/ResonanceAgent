@@ -1,0 +1,89 @@
+﻿=== ResonanceAgent AUDIT REPORT ===
+Root: C:\Users\mahir\ResonanceAgent
+Date: 2025-08-12T21:25:55
+
+== File counts by extension ==
+    8  .py
+    7  .pyc
+    4  .ps1
+    3  .bak
+    2  .txt
+    1  .js
+    1  .css
+    1  .html
+    1  .env
+    1  .sqlite3
+    1  .gitignore
+    1  .example
+    1  .bat
+    1  .md
+
+== Large files (>=50MB) ==
+None
+
+== Config-like files ==
+C:\Users\mahir\ResonanceAgent\.env
+C:\Users\mahir\ResonanceAgent\agent.py
+C:\Users\mahir\ResonanceAgent\core_types.py
+C:\Users\mahir\ResonanceAgent\load_env.ps1
+C:\Users\mahir\ResonanceAgent\main.py
+C:\Users\mahir\ResonanceAgent\memory_manager.py
+C:\Users\mahir\ResonanceAgent\nlp_engine.py
+C:\Users\mahir\ResonanceAgent\quick_smoke.ps1
+C:\Users\mahir\ResonanceAgent\RA_audit.ps1
+C:\Users\mahir\ResonanceAgent\ra_smoke.py
+C:\Users\mahir\ResonanceAgent\requirements.txt
+C:\Users\mahir\ResonanceAgent\response_generator.py
+C:\Users\mahir\ResonanceAgent\setmodel.ps1
+C:\Users\mahir\ResonanceAgent\web_server.py
+C:\Users\mahir\ResonanceAgent\static\script.js
+
+== JSON validation ==
+No .json files
+
+== UTF-8 BOM check (true=has BOM) ==
+False	C:\Users\mahir\ResonanceAgent\.env
+False	C:\Users\mahir\ResonanceAgent\agent.py
+False	C:\Users\mahir\ResonanceAgent\core_types.py
+False	C:\Users\mahir\ResonanceAgent\load_env.ps1
+False	C:\Users\mahir\ResonanceAgent\main.py
+False	C:\Users\mahir\ResonanceAgent\memory_manager.py
+False	C:\Users\mahir\ResonanceAgent\nlp_engine.py
+False	C:\Users\mahir\ResonanceAgent\quick_smoke.ps1
+True	C:\Users\mahir\ResonanceAgent\RA_audit.ps1
+False	C:\Users\mahir\ResonanceAgent\ra_smoke.py
+False	C:\Users\mahir\ResonanceAgent\requirements.txt
+False	C:\Users\mahir\ResonanceAgent\response_generator.py
+True	C:\Users\mahir\ResonanceAgent\RES_REPORT.txt
+False	C:\Users\mahir\ResonanceAgent\setmodel.ps1
+False	C:\Users\mahir\ResonanceAgent\web_server.py
+
+== Secret scan (potential) ==
+None
+
+== Endpoints & Models found ==
+C:\Users\mahir\ResonanceAgent\.env
+    Endpoints: http://127.0.0.1:11434/v1
+    Models   : gpt-oss:20b, nomic-embed-text:latest
+C:\Users\mahir\ResonanceAgent\main.py
+    Endpoints: http://localhost:11434/v1
+    Models   : 
+C:\Users\mahir\ResonanceAgent\nlp_engine.py
+    Endpoints: http://localhost:11434/v1
+    Models   : 
+C:\Users\mahir\ResonanceAgent\RA_audit.ps1
+    Endpoints: 
+    Models   : llama3, gpt-oss:20b, mistral:latest, azeri-llama3:latest, command-r:latest, deepseek-coder:33b, nomic-embed-text:latest
+C:\Users\mahir\ResonanceAgent\response_generator.py
+    Endpoints: http://localhost:11434/v1
+    Models   : 
+C:\Users\mahir\ResonanceAgent\RES_REPORT.txt
+    Endpoints: http://127.0.0.1:11434/v1, http://localhost:11434/v1, http://127.0.0.1:11434/v1,, http://localhost:11434/v1,, http://127.0.0.1:11434/v1,,
+    Models   : gpt-oss:20b, nomic-embed-text:latest, llama3, mistral:latest, azeri-llama3:latest, command-r:latest, deepseek-coder:33b, llama3:latest
+
+== .env parsed ==
+ENGINE_TYPE=local
+LOCAL_CHAT_MODEL_NAME=gpt-oss:20b
+LOCAL_EMBEDDING_MODEL_NAME=nomic-embed-text:latest
+LOCAL_EMBEDDING_SIZE=768
+LOCAL_API_BASE_URL=http://127.0.0.1:11434/v1

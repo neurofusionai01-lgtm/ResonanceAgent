@@ -1,0 +1,10 @@
+google-generativeai
+numpy
+chromadb
+python-dotenv
+httpx
+fastapi
+uvicorn[standard]
+aiofiles
+python-multipart
+Jinja2
