@@ -127,3 +127,13 @@ class LocalNLPEngine(NLPEngineProtocol):
         except Exception as e:
             print(f"❌ Lokal embedding yaradılmasında xəta: {e}")
             return np.zeros(self.embedding_size)
+
+    async def close(self) -> None:
+        """Async HTTP müştərisini bağlayır."""
+        await self.client.aclose()
+
+    async def __aenter__(self) -> "LocalNLPEngine":
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.close()

@@ -27,6 +27,13 @@ class ResonanceAgent:
         self.user_profile = UserProfile(user_id=user_id)
         print(f"🤖 Resonance Agent '{self.user_id}' üçün hazır vəziyyətdədir.")
 
+    async def close(self) -> None:
+        """Agentin daxili resurslarını azad edir."""
+        if hasattr(self.nlp_engine, "close"):
+            await self.nlp_engine.close()
+        if hasattr(self.response_generator, "close"):
+            await self.response_generator.close()
+
     async def process_message(self, text: str) -> Dict[str, Any]:
         """İstifadəçi mesajını tamamilə emal edir və cavab qaytarır."""
         print("\n" + "-"*50)

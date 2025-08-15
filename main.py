@@ -80,6 +80,7 @@ async def run_cli_mode(agent: ResonanceAgent):
         except (KeyboardInterrupt, EOFError):
             break
     print("\n👋 Agentlə dialoq bitdi. Sağ olun!")
+    await agent.close()
 
 
 # ---Əsas Giriş Nöqtəsi ---

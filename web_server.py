@@ -27,6 +27,8 @@ async def lifespan(app: FastAPI):
         agent_instance = None
     yield
     print("--- Veb Server Dayanır ---")
+    if agent_instance is not None:
+        await agent_instance.close()
 
 def get_agent() -> ResonanceAgent:
     """Agenti əldə etmək üçün FastAPI dependency funksiyası."""
@@ -82,3 +84,5 @@ async def get_status(agent: ResonanceAgent = Depends(get_agent)):
         "agent_initialized": True, # 'Depends' bunu təmin edir
         "engine_type": os.getenv("ENGINE_TYPE", "google").lower()
     }
+
+
