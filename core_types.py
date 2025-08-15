@@ -237,11 +237,20 @@ class MemoryFragment:
 
             embedding = np.array(parsed_data.get("embedding")) if parsed_data.get("embedding") is not None else None
             emotional_context = EmotionalValence[parsed_data.get("emotional_context")] if parsed_data.get("emotional_context") else None
-            
+
             created_at_dt = datetime.fromisoformat(parsed_data["created_at"])
             last_accessed_dt = datetime.fromisoformat(parsed_data["last_accessed"])
-            if created_at_dt.tzinfo is None: created_at_dt = created_at_dt.replace(tzinfo=timezone.utc)
-            if last_accessed_dt.tzinfo is None: last_accessed_dt = last_accessed_dt.replace(tzinfo=timezone.utc)
+            if created_at_dt.tzinfo is None:
+                created_at_dt = created_at_dt.replace(tzinfo=timezone.utc)
+            if last_accessed_dt.tzinfo is None:
+                last_accessed_dt = last_accessed_dt.replace(tzinfo=timezone.utc)
+
+            tags_data = parsed_data.get("tags", []) or []
+            related_memories_data = parsed_data.get("related_memories", []) or []
+            if not isinstance(tags_data, list):
+                tags_data = [tags_data]
+            if not isinstance(related_memories_data, list):
+                related_memories_data = [related_memories_data]
 
             return cls(
                 id=parsed_data["id"],
@@ -249,17 +258,17 @@ class MemoryFragment:
                 memory_type=MemoryType(parsed_data["memory_type"]),
                 created_at=created_at_dt,
                 last_accessed=last_accessed_dt,
-                access_count=data.get("access_count", 0),
-                importance=data.get("importance", 0.0),
-                confidence=data.get("confidence", 1.0),
+                access_count=parsed_data.get("access_count", 0),
+                importance=parsed_data.get("importance", 0.0),
+                confidence=parsed_data.get("confidence", 1.0),
                 embedding=embedding,
                 tags=tags_data,
-                source=data.get("source", "user_interaction"),
+                source=parsed_data.get("source", "user_interaction"),
                 related_memories=related_memories_data,
                 emotional_context=emotional_context,
-                decay_factor=data.get("decay_factor", 1.0),
-                consolidation_level=data.get("consolidation_level", 0),
-                metadata=data.get("metadata", {})
+                decay_factor=parsed_data.get("decay_factor", 1.0),
+                consolidation_level=parsed_data.get("consolidation_level", 0),
+                metadata=parsed_data.get("metadata", {})
             )
         except (KeyError, ValueError) as e:
             raise ValueError(f"Invalid MemoryFragment data: {e}")
