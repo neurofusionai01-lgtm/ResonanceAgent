@@ -91,3 +91,14 @@ class LocalResponseGenerator(ResponseGeneratorProtocol):
             final_response = "I'm sorry, I encountered an error with the local model. Please check if it's running correctly."
 
         return {"text": final_response}
+
+    async def close(self) -> None:
+        """Async HTTP müştərisini bağlayır."""
+        await self.client.aclose()
+
+    async def __aenter__(self) -> "LocalResponseGenerator":
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.close()
+
