@@ -1,4 +1,5 @@
 
+import asyncio
 import chromadb
 import uuid
 from typing import List, Dict, Any, Optional
@@ -43,7 +44,8 @@ class VectorDBMemoryManager(MemoryManagerProtocol):
         # Add user_id to metadata for filtering
         serializable_metadata["user_id"] = user_id
 
-        self.collection.add(
+        await asyncio.to_thread(
+            self.collection.add,
             ids=[memory.id],
             embeddings=[embedding_list] if embedding_list else None,
             metadatas=[serializable_metadata]
@@ -58,7 +60,8 @@ class VectorDBMemoryManager(MemoryManagerProtocol):
             
         print(f"🔍 İstifadəçi '{user_id}' üçün ən oxşar {limit} yaddaş axtarılır...")
         
-        results = self.collection.query(
+        results = await asyncio.to_thread(
+            self.collection.query,
             query_embeddings=[query_embedding.tolist()],
             n_results=limit,
             where={"user_id": user_id} # Yalnız bu istifadəçinin yaddaşları arasında axtar
@@ -81,7 +84,7 @@ class VectorDBMemoryManager(MemoryManagerProtocol):
         print(f"🔄 '{memory_id}' ID-li yaddaş yenilənir...")
         try:
             # Əvvəlcə köhnə yaddaşı alırıq
-            existing_data = self.collection.get(ids=[memory_id], where={"user_id": user_id})
+            existing_data = await asyncio.to_thread(self.collection.get, ids=[memory_id], where={"user_id": user_id})
             if not existing_data or not existing_data['metadatas']:
                 print(f"❌ Yeniləmək üçün '{memory_id}' ID-li yaddaş tapılmadı.")
                 return False
@@ -93,7 +96,8 @@ class VectorDBMemoryManager(MemoryManagerProtocol):
             updated_fragment = MemoryFragment.from_dict(memory_dict)
             
             # Köhnəni silib, yenisini əlavə edirik (ChromaDB-də bu "upsert" adlanır)
-            self.collection.upsert(
+            await asyncio.to_thread(
+                self.collection.upsert,
                 ids=[updated_fragment.id],
                 embeddings=[updated_fragment.embedding.tolist() if updated_fragment.embedding is not None else None],
                 metadatas=[updated_fragment.to_dict()]

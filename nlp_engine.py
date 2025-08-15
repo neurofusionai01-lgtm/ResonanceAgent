@@ -112,30 +112,6 @@ class LocalNLPEngine(NLPEngineProtocol):
             print(f"❌ Lokal niyyət analizi xətası: {e}")
             # Xəta zamanı default IntentVector qaytarırıq
             return IntentVector(primary_intent=IntentCategory.GENERAL_CONVERSATION)
-        print(f"🧠 Lokal model ilə niyyət analizi edilir: '{text}'")
-        try:
-            prompt = INTENT_EXTRACTION_PROMPT.format(
-                text=text,
-                intent_categories=[i.value for i in IntentCategory],
-                emotion_valences=[e.name for e in EmotionalValence],
-                urgency_levels=[u.name for u in UrgencyLevel]
-            )
-            response = await self.client.post(
-                "/chat/completions",
-                json={
-                    "model": self.chat_model_name,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "response_format": {"type": "json_object"},
-                    "temperature": 0.0
-                }
-            )
-            response.raise_for_status()
-            intent_data = json.loads(response.json()["choices"][0]["message"]["content"])
-            return IntentVector.from_dict(intent_data)
-        except Exception as e:
-            print(f"❌ Lokal niyyət analizi xətası: {e}")
-            # Xəta zamanı default IntentVector qaytarırıq
-            return IntentVector(primary_intent=IntentCategory.GENERAL_CONVERSATION)
 
     async def generate_embedding(self, text: str) -> np.ndarray:
         print(f"🔢 Lokal model ilə embedding yaradılır: '{text}'")

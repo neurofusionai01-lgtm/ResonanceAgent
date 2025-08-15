@@ -97,11 +97,13 @@ if __name__ == "__main__":
     try:
         if args.mode == "web":
             print("--- Veb Server Rejimi Başladılır ---")
+            # Relaod rejimini ətraf mühit dəyişənindən oxuyuruq
+            reload_mode = os.getenv("RELOAD_MODE", "False").lower() in ("true", "1", "t")
             uvicorn.run(
                 "web_server:app", 
                 host=os.getenv("HOST", "127.0.0.1"), 
                 port=int(os.getenv("PORT", 8000)),
-                reload=True
+                reload=reload_mode
             )
         
         elif args.mode == "cli":
