@@ -22,24 +22,19 @@ class VectorDBMemoryManager(MemoryManagerProtocol):
         """Yaddaş fraqmentini vektor verilənlər bazasında saxlayır."""
         print(f"💾 '{memory.id}' ID-li yaddaş saxlanılır (İstifadəçi: {user_id})...")
         
-        # Embedding-in düzgün formatda olduğundan əmin oluruq
-        embedding_list = None
-        if memory.embedding is not None:
-            if isinstance(memory.embedding, np.ndarray):
-                embedding_list = memory.embedding.tolist()
-            else:
-                embedding_list = memory.embedding # Assume it's already a list
-
         # ChromaDB-yə yalnız string, int, float, bool tipləri verilə bilər.
         # Get the serializable dictionary from the MemoryFragment
         serializable_metadata = memory.to_dict()
 
-        # Extract the embedding from the metadata dictionary, as it needs to be passed separately
-        embedding_list = serializable_metadata.pop("embedding", None) # This is the crucial line
-
-        # Ensure embedding_list is in the correct format for ChromaDB
-        if embedding_list is not None and isinstance(embedding_list, np.ndarray):
-            embedding_list = embedding_list.tolist()
+        # Embedding-i ayrıca idarə edirik. to_dict artıq onu metadatadan çıxarır,
+        # buna görə əvvəlcə memory obyektindən götürürük və list formatına salırıq.
+        embedding_list = None
+        if memory.embedding is not None:
+            embedding_list = memory.embedding.tolist() if isinstance(memory.embedding, np.ndarray) else memory.embedding
+        # Əgər hər hansı səbəbdən embedding to_dict-dən geri qayıdarsa, onu da nəzərə alırıq
+        embedded_from_meta = serializable_metadata.pop("embedding", None)
+        if embedding_list is None and embedded_from_meta is not None:
+            embedding_list = embedded_from_meta.tolist() if isinstance(embedded_from_meta, np.ndarray) else embedded_from_meta
 
         # Add user_id to metadata for filtering
         serializable_metadata["user_id"] = user_id
