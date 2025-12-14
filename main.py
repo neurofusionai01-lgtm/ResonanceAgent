@@ -23,17 +23,20 @@ def setup_agent(engine_type: str) -> ResonanceAgent:
         response_generator = SmartResponseGenerator(api_key=api_key)
     
     elif engine_type == "local":
-        chat_model_name = os.getenv("LOCAL_CHAT_MODEL_NAME")
-        embedding_model_name = os.getenv("LOCAL_EMBEDDING_MODEL_NAME")
-        embedding_size_str = os.getenv("LOCAL_EMBEDDING_SIZE")
+        # Default values for local engine to prevent crashes if .env is missing/partial
+        chat_model_name = os.getenv("LOCAL_CHAT_MODEL_NAME", "llama3:latest")
+        embedding_model_name = os.getenv("LOCAL_EMBEDDING_MODEL_NAME", "nomic-embed-text:latest")
+        embedding_size_str = os.getenv("LOCAL_EMBEDDING_SIZE", "768")
 
-        if not all([chat_model_name, embedding_model_name, embedding_size_str]):
-            raise ValueError("Lokal mühərrik üçün tələb olunan parametrlər (.env) tapılmadı.")
-        
+        print(f"ℹ️  Local Config: Chat='{chat_model_name}', Embed='{embedding_model_name}', Size={embedding_size_str}")
+
         try:
             embedding_size = int(embedding_size_str)
         except (ValueError, TypeError):
-            raise ValueError(f"LOCAL_EMBEDDING_SIZE rəqəm olmalıdır, amma '{embedding_size_str}' tapıldı.")
+             print(f"⚠️ LOCAL_EMBEDDING_SIZE '{embedding_size_str}' is invalid. Defaulting to 768.")
+             embedding_size = 768
+
+        api_base_url = os.getenv("LOCAL_API_BASE_URL", "http://localhost:11434/v1")
 
         api_base_url = os.getenv("LOCAL_API_BASE_URL", "http://localhost:11434/v1")
         
@@ -65,21 +68,50 @@ def setup_agent(engine_type: str) -> ResonanceAgent:
 
 # --- CLI Modu üçün Köməkçi Funksiya ---
 async def run_cli_mode(agent: ResonanceAgent):
-    """Agent üçün interaktiv komanda sətri interfeysini işə salır."""
-    print("\n--- Dialoqa Başlamağa Hazır ---")
-    print("Çıxmaq üçün 'exit' və ya 'quit' yazın.")
+    """Agent üçün interaktiv komanda sətri interfeysini işə salır (Rich UI ilə)."""
+    try:
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich.markdown import Markdown
+        from rich.text import Text
+    except ImportError:
+        print("⚠️  'rich' kitabxanası tapılmadı. Zəhmət olmasa 'pip install rich' əmrini icra edin.")
+        return
+
+    console = Console()
+    console.print(Panel.fit("[bold cyan]Resonance AI Agent[/bold cyan]\n[dim]ReAct Enabled • Memory Active[/dim]", border_style="blue"))
+    console.print("[dim]Çıxmaq üçün 'exit' və ya 'quit' yazın.[/dim]\n")
 
     while True:
         try:
-            user_input = await asyncio.to_thread(input, f"\n[{agent.user_id}] Siz: ")
+            user_input = await asyncio.to_thread(console.input, f"[bold green]👤 {agent.user_id}:[/bold green] ")
             if user_input.lower() in ['exit', 'quit']:
                 break
             
-            response = await agent.process_message(user_input)
-            print(f"🤖 Agent: {response.get('text')}")
+            with console.status("[bold yellow]Düşünürəm...[/bold yellow]", spinner="dots"):
+                response = await agent.process_message(user_input)
+
+            # Show Thoughts/Trace
+            thought = response.get('thought')
+            if thought:
+                console.print(Panel(Markdown(thought), title="[bold yellow]🧠 Thought Process[/bold yellow]", border_style="yellow", expand=False))
+
+            # Show Trace (if available from ReAct engine)
+            trace = response.get('trace')
+            if trace:
+                for step in trace:
+                    if step.get('action'):
+                        console.print(f"[dim]⚙️  Action: {step['action']} ({step['input']})[/dim]")
+                    if step.get('observation'):
+                        console.print(f"[dim]   Result: {step['observation']}[/dim]")
+
+            # Show Final Answer
+            console.print(Panel(Markdown(response.get('text')), title="[bold green]🤖 Resonance[/bold green]", border_style="green"))
+            print() # Spacer
+
         except (KeyboardInterrupt, EOFError):
             break
-    print("\n👋 Agentlə dialoq bitdi. Sağ olun!")
+    console.print("\n[bold red]👋 Agentlə dialoq bitdi. Sağ olun![/bold red]")
 
 
 # ---Əsas Giriş Nöqtəsi ---

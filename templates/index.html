@@ -3,23 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance Agent</title>
+    <title>Resonance AI | Neural Interface</title>
     <link rel="stylesheet" href="/static/style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-header">
-            <h2>Resonance Agent</h2>
-            <span id="status-indicator" class="disconnected"></span>
-        </div>
-        <div id="chat-box">
-            <!-- Messages will be appended here -->
-        </div>
-        <div id="input-area">
-            <textarea id="message-input" placeholder="Type your message here..." rows="1"></textarea>
-            <button id="send-button">Send</button>
-        </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-brain-circuit"></i>
+                <span>RESONANCE</span>
+            </div>
+            <div class="menu">
+                <div class="menu-item active">
+                    <i class="fa-solid fa-message"></i> Chat
+                </div>
+                <div class="menu-item" onclick="alert('Coming soon: Memory Explorer')">
+                    <i class="fa-solid fa-database"></i> Memory
+                </div>
+                <div class="menu-item" onclick="alert('Coming soon: Settings')">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </div>
+            </div>
+            <div class="status-box">
+                <span id="status-indicator" class="status-dot disconnected"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-interface">
+            <header class="chat-header">
+                <div class="header-info">
+                    <h3>Neural Link Active</h3>
+                    <p>Model: Gemini/Llama • Memory: VectorDB</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="location.reload()" title="Refresh Session"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+            </header>
+
+            <div id="chat-box" class="chat-content">
+                <!-- Welcome Message -->
+                <div class="message assistant">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="message-body">
+                        <div class="bubble">
+                            Salam! Mən <strong>Resonance</strong>, sizin süni intellektli köməkçinizəm.
+                            <br>Mən sizi xatırlayıram və kontekstli düşünə bilirəm. Necə kömək edə bilərəm?
+                        </div>
+                    </div>
+                </div>
+                <!-- Messages injected by JS -->
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="message-input" placeholder="Type your message here..." rows="1"></textarea>
+                    <button id="send-button"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+                <div class="footer-text">Resonance AI Prototype v2.0 • Powered by Python & FastAPI</div>
+            </div>
+        </main>
     </div>
+
     <script src="/static/script.js"></script>
 </body>
 </html>

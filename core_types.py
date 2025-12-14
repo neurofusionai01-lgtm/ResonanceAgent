@@ -253,9 +253,9 @@ class MemoryFragment:
                 importance=data.get("importance", 0.0),
                 confidence=data.get("confidence", 1.0),
                 embedding=embedding,
-                tags=tags_data,
+                tags=data.get("tags", []),
                 source=data.get("source", "user_interaction"),
-                related_memories=related_memories_data,
+                related_memories=data.get("related_memories", []),
                 emotional_context=emotional_context,
                 decay_factor=data.get("decay_factor", 1.0),
                 consolidation_level=data.get("consolidation_level", 0),
@@ -313,6 +313,30 @@ class UserProfile:
         if intent.domain_context and intent.domain_context not in self.interests:
             self.interests.append(intent.domain_context)
             self.interests = self.interests[-self.MAX_INTERESTS_TO_STORE:]
+
+    def to_json(self) -> str:
+        """Serializes the UserProfile to a JSON string."""
+        data = self.__dict__.copy()
+        data["created_at"] = self.created_at.isoformat()
+        data["last_updated"] = self.last_updated.isoformat()
+        return json.dumps(data, indent=2)
+
+    @classmethod
+    def from_json(cls, json_str: str) -> 'UserProfile':
+        """Deserializes a UserProfile from a JSON string."""
+        data = json.loads(json_str)
+        # Handle datetime conversion
+        data["created_at"] = datetime.fromisoformat(data["created_at"])
+        data["last_updated"] = datetime.fromisoformat(data["last_updated"])
+
+        # We need to filter out keys that might not be in the __init__ if the schema changed,
+        # or handle missing keys. dataclass constructor expects specific args.
+        # But since we control the schema, let's assume direct mapping + strictness for now.
+        # We should remove 'MAX_INTERESTS_TO_STORE' if it's in the json (it shouldn't be as it's a class var, but check just in case)
+        if "MAX_INTERESTS_TO_STORE" in data:
+            del data["MAX_INTERESTS_TO_STORE"]
+
+        return cls(**data)
 
 
 # Protocol definitions for dependency injection
