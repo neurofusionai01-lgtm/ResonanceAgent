@@ -4,11 +4,49 @@ from typing import Dict, Any
 from datetime import datetime, timezone
 import uuid
 import os
+import json
 
 from core_types import (
     MemoryFragment, MemoryType, UserProfile, IntentVector, 
     NLPEngineProtocol, MemoryManagerProtocol, ResponseGeneratorProtocol
 )
+
+class ChatLogger:
+    """Manages simple JSON chat logs for history display."""
+    def __init__(self, user_id: str):
+        self.log_path = f"./profiles/{user_id}_chat.json"
+
+    def log_interaction(self, user_text: str, agent_response: str, thought: str = None):
+        history = self.get_history()
+        entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "role": "user",
+            "content": user_text
+        }
+        history.append(entry)
+
+        agent_entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "role": "assistant",
+            "content": agent_response,
+            "thought": thought
+        }
+        history.append(agent_entry)
+
+        try:
+            with open(self.log_path, "w", encoding="utf-8") as f:
+                json.dump(history, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"❌ Chat log yazılarkən xəta: {e}")
+
+    def get_history(self) -> list:
+        if os.path.exists(self.log_path):
+            try:
+                with open(self.log_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except:
+                return []
+        return []
 
 class ResonanceAgent:
     """Bütün komponentləri birləşdirən və agentin məntiqini idarə edən əsas sinif.""" 
@@ -28,8 +66,12 @@ class ResonanceAgent:
         self.profile_path = f"./profiles/{user_id}.json"
         self._ensure_profile_dir()
         self.user_profile = self._load_profile()
+        self.chat_logger = ChatLogger(user_id)
 
         print(f"🤖 Resonance Agent '{self.user_id}' üçün hazır vəziyyətdədir.")
+
+    def get_chat_history(self) -> list:
+        return self.chat_logger.get_history()
 
     def _ensure_profile_dir(self):
         os.makedirs(os.path.dirname(self.profile_path), exist_ok=True)
@@ -103,6 +145,10 @@ class ResonanceAgent:
         # 7. İstifadəçi profilini yenilə
         self.user_profile.update_from_interaction(intent_vector)
         self._save_profile() # <--- Persist changes to disk
+
+        # 8. Chat logunu yenilə
+        self.chat_logger.log_interaction(text, response.get("text"), response.get("thought"))
+
         print(f"👤 İstifadəçi profili yeniləndi. Ümumi interaksiya: {self.user_profile.interaction_history.get('total_interactions')}")
         print("-"*50 + "\n")
 

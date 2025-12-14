@@ -65,6 +65,7 @@ class SmartResponseGenerator(ResponseGeneratorProtocol):
             raw_text = response.text
 
             # Extract thought process
+            thought_process = None
             thought_match = re.search(r'<thought>(.*?)</thought>', raw_text, re.DOTALL)
             if thought_match:
                 thought_process = thought_match.group(1).strip()
@@ -77,8 +78,9 @@ class SmartResponseGenerator(ResponseGeneratorProtocol):
         except Exception as e:
             print(f"❌ Cavab yaradılmasında xəta: {e}")
             final_response = "Bağışlayın, sorğunuzu emal edərkən xəta baş verdi."
+            thought_process = None
 
-        return {"text": final_response}
+        return {"text": final_response, "thought": thought_process}
 
 
 class LocalResponseGenerator(ResponseGeneratorProtocol):
@@ -129,6 +131,7 @@ class LocalResponseGenerator(ResponseGeneratorProtocol):
             raw_text = response_json['choices'][0]['message']['content']
 
             # Extract thought process
+            thought_process = None
             thought_match = re.search(r'<thought>(.*?)</thought>', raw_text, re.DOTALL)
             if thought_match:
                 thought_process = thought_match.group(1).strip()
@@ -141,5 +144,6 @@ class LocalResponseGenerator(ResponseGeneratorProtocol):
         except Exception as e:
             print(f"❌ Lokal cavab yaradılmasında xəta: {e}")
             final_response = "I'm sorry, I encountered an error with the local model. Please check if it's running correctly."
+            thought_process = None
 
-        return {"text": final_response}
+        return {"text": final_response, "thought": thought_process}

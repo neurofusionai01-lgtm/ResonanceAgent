@@ -74,6 +74,16 @@ async def chat_with_agent(
         print(f"❌ Söhbət zamanı daxili xəta: {e}")
         raise HTTPException(status_code=500, detail=f"Agentlə söhbət zamanı daxili xəta baş verdi: {e}")
 
+@app.get("/history")
+async def get_chat_history(agent: ResonanceAgent = Depends(get_agent)):
+    """Agentin söhbət tarixçəsini qaytarır."""
+    try:
+        history = agent.get_chat_history()
+        return JSONResponse(content={"history": history})
+    except Exception as e:
+        print(f"❌ Tarixçə alınarkən xəta: {e}")
+        return JSONResponse(content={"history": []})
+
 @app.get("/status")
 async def get_status(agent: ResonanceAgent = Depends(get_agent)):
     """Agentin və serverin vəziyyətini yoxlayır."""
