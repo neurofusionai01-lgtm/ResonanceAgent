@@ -82,6 +82,15 @@ class SmartResponseGenerator(ResponseGeneratorProtocol):
 
         return {"text": final_response, "thought": thought_process}
 
+    async def generate_raw(self, prompt: str) -> str:
+        """Executes a raw generation without the standard template (used for ReAct)."""
+        try:
+            response = await self.model.generate_content_async(prompt)
+            return response.text
+        except Exception as e:
+            print(f"❌ Raw Generate Error: {e}")
+            return f"Error: {e}"
+
 
 class LocalResponseGenerator(ResponseGeneratorProtocol):
     """Lokal AI modelindən istifadə edərək cavab yaradır."""
@@ -147,3 +156,20 @@ class LocalResponseGenerator(ResponseGeneratorProtocol):
             thought_process = None
 
         return {"text": final_response, "thought": thought_process}
+
+    async def generate_raw(self, prompt: str) -> str:
+        """Executes a raw generation without the standard template (used for ReAct)."""
+        try:
+            response = await self.client.post(
+                "/chat/completions",
+                json={
+                    "model": self.model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.0 # Strict for tools
+                }
+            )
+            response.raise_for_status()
+            return response.json()['choices'][0]['message']['content']
+        except Exception as e:
+            print(f"❌ Raw Generate Error: {e}")
+            return f"Error: {e}"

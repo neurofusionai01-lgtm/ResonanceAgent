@@ -10,6 +10,8 @@ from core_types import (
     MemoryFragment, MemoryType, UserProfile, IntentVector, 
     NLPEngineProtocol, MemoryManagerProtocol, ResponseGeneratorProtocol
 )
+from tools import ToolRegistry
+from react_engine import ReActEngine
 
 class ChatLogger:
     """Manages simple JSON chat logs for history display."""
@@ -68,6 +70,10 @@ class ResonanceAgent:
         self.user_profile = self._load_profile()
         self.chat_logger = ChatLogger(user_id)
 
+        # Tools & ReAct
+        self.tool_registry = ToolRegistry(user_id)
+        self.react_engine = ReActEngine(response_generator, self.tool_registry)
+
         print(f"🤖 Resonance Agent '{self.user_id}' üçün hazır vəziyyətdədir.")
 
     def get_chat_history(self) -> list:
@@ -121,13 +127,10 @@ class ResonanceAgent:
             "retrieved_memories": retrieved_memories
         }
 
-        # 5. Cavabı yarat
-        response = await self.response_generator.generate_response(
-            user_id=self.user_id,
-            query=text,
-            intent=intent_vector,
-            context=context
-        )
+        # 5. Cavabı yarat (Using ReAct Engine instead of simple generation)
+        # response = await self.response_generator.generate_response(...)
+        print("🧠 ReAct Engine işə düşür...")
+        response = await self.react_engine.run(query=text, context=context)
 
         # 6. Bu interaksiyanı yaddaşda saxla
         new_memory = MemoryFragment(

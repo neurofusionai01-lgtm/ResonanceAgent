@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             contentHtml += `
                 <div class="thought-container">
                     <div class="thought-header" onclick="toggleThought('${thoughtId}', this)">
-                        <i class="fa-solid fa-chevron-right"></i> Neural Processing
+                        <i class="fa-solid fa-microchip"></i> Reasoning & Actions
                     </div>
                     <div id="${thoughtId}" class="thought-content">
                         ${marked.parse(thought)}
@@ -140,7 +140,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Parse Markdown for the main text
         const parsedText = marked.parse(text);
-        contentHtml += `<div class="bubble">${parsedText}</div>`;
+
+        // Add Speak Button for Assistant
+        let actionButtons = '';
+        if (role === 'assistant') {
+            actionButtons = `
+                <div class="message-actions">
+                    <button class="action-btn" onclick="speakText(this)" title="Read Aloud">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        contentHtml += `<div class="bubble">${parsedText}${actionButtons}</div>`;
 
         msgDiv.innerHTML = `
             <div class="avatar">${avatarIcon}</div>
@@ -183,5 +196,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = document.getElementById(id);
         content.classList.toggle('show');
         header.classList.toggle('active');
+    }
+
+    // TTS Function
+    window.speakText = function(btn) {
+        const bubble = btn.closest('.bubble');
+        // Extract text only, ignoring hidden elements or buttons
+        const text = bubble.innerText.replace("Reasoning & Actions", "").trim();
+
+        if ('speechSynthesis' in window) {
+            // Cancel current speech if any
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            // Try to set a good voice
+            const voices = window.speechSynthesis.getVoices();
+            // Prefer Google US English or similar if available, or just default
+            // For Azerbaijani, support might be limited, so default is safest.
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Text-to-Speech not supported in this browser.");
+        }
     }
 });

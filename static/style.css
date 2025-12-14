@@ -374,3 +374,27 @@ textarea {
     display: block;
     overflow-x: auto;
 }
+
+/* Message Actions */
+.message-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 5px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.action-btn:hover {
+    color: white;
+    background-color: rgba(255,255,255,0.1);
+}
