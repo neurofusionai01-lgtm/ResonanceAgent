@@ -12,6 +12,8 @@ INTENT_EXTRACTION_PROMPT = """
 Analyze the user's text and provide a detailed intent analysis in JSON format.
 The user text is: "{text}"
 
+If the user asks to perform a calculation, write a note, or look up information, classify the intent as 'PROBLEM_SOLVING' or 'information_seeking'.
+
 The JSON output should strictly follow this structure:
 {{
   "primary_intent": "one of {intent_categories}",
@@ -20,7 +22,7 @@ The JSON output should strictly follow this structure:
   "urgency": "one of {urgency_levels}",
   "confidence": 0.0 to 1.0,
   "complexity": 0.0 to 1.0,
-  "domain_context": "A short, relevant subject domain",
+  "domain_context": "A short, relevant subject domain (e.g., 'math', 'personal_notes')",
   "temporal_context": "past, present, or future",
   "interaction_style": "formal, casual, or technical"
 }}
