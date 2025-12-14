@@ -23,17 +23,20 @@ def setup_agent(engine_type: str) -> ResonanceAgent:
         response_generator = SmartResponseGenerator(api_key=api_key)
     
     elif engine_type == "local":
-        chat_model_name = os.getenv("LOCAL_CHAT_MODEL_NAME")
-        embedding_model_name = os.getenv("LOCAL_EMBEDDING_MODEL_NAME")
-        embedding_size_str = os.getenv("LOCAL_EMBEDDING_SIZE")
+        # Default values for local engine to prevent crashes if .env is missing/partial
+        chat_model_name = os.getenv("LOCAL_CHAT_MODEL_NAME", "llama3:latest")
+        embedding_model_name = os.getenv("LOCAL_EMBEDDING_MODEL_NAME", "nomic-embed-text:latest")
+        embedding_size_str = os.getenv("LOCAL_EMBEDDING_SIZE", "768")
 
-        if not all([chat_model_name, embedding_model_name, embedding_size_str]):
-            raise ValueError("Lokal mühərrik üçün tələb olunan parametrlər (.env) tapılmadı.")
-        
+        print(f"ℹ️  Local Config: Chat='{chat_model_name}', Embed='{embedding_model_name}', Size={embedding_size_str}")
+
         try:
             embedding_size = int(embedding_size_str)
         except (ValueError, TypeError):
-            raise ValueError(f"LOCAL_EMBEDDING_SIZE rəqəm olmalıdır, amma '{embedding_size_str}' tapıldı.")
+             print(f"⚠️ LOCAL_EMBEDDING_SIZE '{embedding_size_str}' is invalid. Defaulting to 768.")
+             embedding_size = 768
+
+        api_base_url = os.getenv("LOCAL_API_BASE_URL", "http://localhost:11434/v1")
 
         api_base_url = os.getenv("LOCAL_API_BASE_URL", "http://localhost:11434/v1")
         
