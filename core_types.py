@@ -314,6 +314,30 @@ class UserProfile:
             self.interests.append(intent.domain_context)
             self.interests = self.interests[-self.MAX_INTERESTS_TO_STORE:]
 
+    def to_json(self) -> str:
+        """Serializes the UserProfile to a JSON string."""
+        data = self.__dict__.copy()
+        data["created_at"] = self.created_at.isoformat()
+        data["last_updated"] = self.last_updated.isoformat()
+        return json.dumps(data, indent=2)
+
+    @classmethod
+    def from_json(cls, json_str: str) -> 'UserProfile':
+        """Deserializes a UserProfile from a JSON string."""
+        data = json.loads(json_str)
+        # Handle datetime conversion
+        data["created_at"] = datetime.fromisoformat(data["created_at"])
+        data["last_updated"] = datetime.fromisoformat(data["last_updated"])
+
+        # We need to filter out keys that might not be in the __init__ if the schema changed,
+        # or handle missing keys. dataclass constructor expects specific args.
+        # But since we control the schema, let's assume direct mapping + strictness for now.
+        # We should remove 'MAX_INTERESTS_TO_STORE' if it's in the json (it shouldn't be as it's a class var, but check just in case)
+        if "MAX_INTERESTS_TO_STORE" in data:
+            del data["MAX_INTERESTS_TO_STORE"]
+
+        return cls(**data)
+
 
 # Protocol definitions for dependency injection
 class NLPEngineProtocol(Protocol):
